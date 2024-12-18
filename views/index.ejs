@@ -148,14 +148,14 @@ marker<%= place.id %>.addListener('click', () => {
       resetMarkers();
       
      // const markerId = <%= place.id %>;
-     google.maps.event.addListener(map, 'idle', () => {
+     //google.maps.event.addListener(map, 'idle', () => {
       const latitude = map.getCenter().lat().toFixed(6);
   const longitude = map.getCenter().lng().toFixed(6);
   const zoomAmount = map.getZoom();
 
   const newUrl = `${window.location.origin}/map?lat=${latitude}&lng=${longitude}&zoom=${zoomAmount}&marker=<%= place.id %>`;
   history.replaceState(null, '', newUrl);
-     })
+    // })
         const selectedPlaceElement = document.querySelector('.selectedPlace');
     selectedPlaceElement.innerHTML = 
     `
