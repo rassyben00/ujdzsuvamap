@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="/css/navigation.css" />
+    <link rel="stylesheet" type="text/css" href="/css/mainDesign.css" />
+    <link rel="stylesheet" type="text/css" href="/css/loginForm.css" />
+    <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+
+    <title>admin</title>
+</head>
+<body>
+    <%- include('partials/navigation')%>
+
+    <form action="/admin/logout" method="get">
+        <button type="submit">Logout</button>
+    </form>
+    <ul>
+        <% places.forEach(place => { %>
+          <li>
+            <strong>ID:</strong> <%= place.id %>, 
+            <strong>Place Name:</strong> <%= place.placename %>,
+            <strong>Description:</strong> <%= place.description%>,
+            <strong>Price:</strong> <%= place.cost %>,
+            <strong>Longitude:</strong> <%= place.longitude %>,
+            <strong>Latitude:</strong> <%= place.latitude %>,
+            <strong>Date:</strong> <%= place.date %>
+            <label>
+              <strong>Visibility:</strong>
+              <form action="/admin/updateVisibility" method="post">
+                <input type="hidden" name="placeId" value="<%= place.id %>">
+                <input type="checkbox" value="<%=place.isVisible%>" id="visibilityCheckbox<%= place.id %>" <% if (place.isVisible) { %>checked<% } %>
+                 />
+                 <button type="submit">submit</button>
+              </form>
+            </label>
+          </li>
+        <% }); %>
+      </ul>
+      <%- include('partials/footer')%>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/headerScript')%>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" crossorigin="anonymous">
+
+  <link rel="icon" href="/favicon/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" type="text/css" href="/css/infowindow.css" />
+  <link rel="stylesheet" type="text/css" href="/css/marker.css" />
+  <link rel="stylesheet" type="text/css" href="/css/mainDesign.css" />
+  <link rel="stylesheet" type="text/css" href="/css/navigation.css" />
+  <link rel="stylesheet" type="text/css" href="/css/footer.css" />
+  <link rel="stylesheet" type="text/css" href="/css/stars.css" />
+
+  <title>Dzsuvamap</title>
+
+</head>
+<body>
+
+  <%- include('partials/navigation')%>
+
+<div id="map-container">
+  <div id="map"></div>
+  <div class="selectedPlace">
+    <% const uniqueMarkerIds = []; %>
+    
+<% ratings.forEach(rating => { %>
+  <% if (!uniqueMarkerIds.includes(rating.markerId)) { %>
+    <div class="placedetail">
+      <hr class="hrWithoutMargin">
+      <% const place = places.find(place => place.id === rating.markerId); %>
+      <% if (place) { %>
+        <div class="place-info">
+          <span class="place-name"><%= place.placename %></span> <!-- Display placename -->
+          <span class="rating-count">(<%= ratings.filter(r => r.markerId === rating.markerId).length %>)</span> <!-- Display rating count -->
+        </div>
+      <% } %>
+      <% const ratingsForId = ratings.filter(r => r.markerId === rating.markerId); %>
+      <% if (ratingsForId.length > 0) { %>
+        <div class="rating-info2">
+
+            <% const totalRating = ratingsForId.reduce((acc, cur) => acc + cur.rating, 0); %>
+            <% const avgRating = totalRating / ratingsForId.length; %>
+            <% const roundedRating = Math.round(avgRating); %>
+            <div class="avg-rating"><%= avgRating.toFixed(1) %></div>
+              <div class="star-rating">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <i class="far fa-star <%= i <= roundedRating ? 'fa-solid' : '' %>"></i>
+                <% } %>
+              </div>
+        </div>
+      <% } else { %>
+        <div class="no-ratings">No ratings for this marker ID</div>
+      <% } %>
+      
+    </div>
+    <% uniqueMarkerIds.push(rating.markerId); %>
+  <% } %>
+<% }) %>
+ 
+  </div>
+</div>
+
+  <footer>
+    <%- include('partials/footer')%>
+  </footer>
+
+  <script>
+
+    let openInfoWindow = null;
+    let map;
+    const markers = [];    
+
+    async function initMap() {
+      const { Map, InfoWindow } = google.maps;
+
+      const response = await fetch('/mapStyle/mapStyle.json');
+      const mapStyles = await response.json();
+
+      const urlParams = new URLSearchParams(window.location.search);
+  const lat = parseFloat(urlParams.get('lat')) || <%= initialCenter.lat %>;
+  const lng = parseFloat(urlParams.get('lng')) || <%= initialCenter.lng %>;
+  const zoom = parseInt(urlParams.get('zoom')) || <%= zoomAmount %>;
+  const selectedMarkerId = parseInt(urlParams.get('marker'));
+      
+      map = new Map(document.getElementById('map'), {
+        center: { lat, lng },
+      zoom,
+      minZoom:2.5,
+      disableDefaultUI: true,
+      styles: mapStyles,
+      fullscreenControl: true
+    });
+
+    google.maps.event.addListener(map, 'idle', () => {
+      // Get the current map center
+      const center = map.getCenter();
+      const latitude = center.lat().toFixed(6); // Limit to 6 decimal places
+      const longitude = center.lng().toFixed(6);
+      const zoomAmount = map.getZoom();
+      // Update the URL dynamically without reloading the page
+      const urlParams = new URLSearchParams(window.location.search);
+  if (!urlParams.has('marker')) {
+    // Update the URL dynamically without reloading the page
+    const newUrl = `${window.location.origin}/map?lat=${latitude}&lng=${longitude}&zoom=${zoomAmount}`;
+    history.replaceState(null, '', newUrl);
+  }
+    });
+
+    let icon={
+      url: '/images/red_marker.png',
+            scaledSize: new google.maps.Size(32,32)
+    }
+
+      function resetMarkers() {
+        markers.forEach((markerData) => {
+          markerData.marker.setIcon({
+            url: '/images/red_marker.png', // Replace with your custom marker icon path
+            scaledSize: new google.maps.Size(32, 32), // Adjust the size if needed
+          }); // Reset marker icon to default
+  });
+}
+
+    // Adding markers for each place
+    
+    <% places.forEach(place => { %>
+      <%if(place.isVisible){%>
+
+      const marker<%= place.id %> = new google.maps.Marker({
+        position: { lat: <%= place.latitude %>, lng: <%= place.longitude %> },
+        map: map,
+        title: '<%= place.placename %>',
+        icon:icon,
+      });
+
+      markers.push({ id: <%= place.id %>, marker: marker<%= place.id %> });
+      const infoWindow<%= place.id %> = new google.maps.InfoWindow({
+        content: `<strong>Hely neve:</strong> <%= place.placename %><br>
+                  <strong>Leírás:</strong> <%= place.description %><br> 
+                  <strong>Ár:</strong> <%= place.cost %><br> 
+                  <strong>Dátum:</strong> <%= new Date(place.date).toISOString().split('T')[0].replace(/-/g, '.') %>`,
+      });
+
+marker<%= place.id %>.addListener('click', () => {
+      resetMarkers();
+      
+     // const markerId = <%= place.id %>;
+     google.maps.event.addListener(map, 'idle', () => {
+      const latitude = map.getCenter().lat().toFixed(6);
+  const longitude = map.getCenter().lng().toFixed(6);
+  const zoomAmount = map.getZoom();
+
+  const newUrl = `${window.location.origin}/map?lat=${latitude}&lng=${longitude}&zoom=${zoomAmount}&marker=<%= place.id %>`;
+  history.replaceState(null, '', newUrl);
+     })
+        const selectedPlaceElement = document.querySelector('.selectedPlace');
+    selectedPlaceElement.innerHTML = 
+    `
+    <div class="placeDetailsContainer">
+        <div class="leftBlock">
+            <div class="placeDetail">
+                <div class="detailLabel"><strong>Hely neve:</strong></div>
+                <div class="detailValue"><%= place.placename %></div>
+            </div>
+        </div>
+        <div class="rightBlock">
+            <div class="placeDetail">
+                <div class="detailLabel"><strong>Ár:</strong></div>
+                <div class="detailValue"><%= place.cost %></div>
+            </div>
+            <hr>
+            <div class="placeDetail">
+                <div class="detailLabel"><strong>Dátum:</strong></div>
+                <div class="detailValue"><%= new Date(place.date).toISOString().split('T')[0].replace(/-/g, '.') %></div>
+            </div>
+        </div>
+    </div>
+    <hr class="hrWithoutMargin">
+                  <div class="placeDetail"><div class="detailLabel"><strong>Leírás:</strong></div><div class="detailValue"><%= place.description %></div></div><hr>
+                 <div class="placeDetail"><div class="detailLabel"><strong>Értékelések:</strong></div><div class="detailValue">
+
+                    <% if (ratings.length > 0) { %>
+      <% let ratingCounts = {}; %>
+      <% let totalRating = 0; %>
+      <% let countRating = 0; %>
+      <% ratings.forEach(rating => { %>
+        <% if(rating.markerId === place.id) { %>
+          <% countRating++; %>
+          <% totalRating += rating.rating; %>
+          <% if (!ratingCounts[rating.rating]) { ratingCounts[rating.rating] = 1; } else { ratingCounts[rating.rating]++; } %>
+        <% } %>
+      <% }); %>
+      <% const avgRating = countRating > 0 ? totalRating / countRating : 0; %>
+      <% const roundedRating = Math.round(avgRating); %>
+      <div class="rating-info2">
+      <div class="avg-rating">
+        <span><%= avgRating.toFixed(1) %></span>
+      </div>
+      <div class="star-rating">
+        <% for (let i = 1; i <= 5; i++) { %>
+          <i class="far fa-star <%= i <= roundedRating ? 'fa-solid' : '' %>"></i>
+        <% } %>
+      </div>
+      <div class="total-rating">
+        <span>(<%= countRating %>)</span>
+      </div>
+    </div>
+      <hr>
+      <% for (let i = 5; i >= 1; i--) { %>
+        <div class="rating">
+          <div class="rating-info">
+            <span class="rating-value"><%= i %> csillag:</span>
+            <span class="rating-count"><%= ratingCounts[i] || 0 %></span>
+          </div>
+          <div class="rating-bar">
+            <div class="progress" style="width: <%= (ratingCounts[i] || 0) / countRating * 100 %>%; background-color: <%= countRating > 0 ? '#4caf50' : '#ddd' %>;"></div>
+          </div>
+        </div>
+      <% } %>
+    <% } else { %>
+      Nincsenek értékelések.
+    <% } %>
+    <hr>
+    <i class="far fa-star star" data-rating="1"></i>
+    <i class="far fa-star star" data-rating="2"></i>
+    <i class="far fa-star star" data-rating="3"></i>
+    <i class="far fa-star star" data-rating="4"></i>
+    <i class="far fa-star star" data-rating="5"></i>
+
+                    </div></div><hr>
+                  <div class="placeDetail"><div class="detailLabel"><strong>Kommentek:</strong>
+                    <ul id="commentsList">
+                    <% comments.forEach(comment => { %>
+                      <% if(comment.markerId === place.id) { %>
+                        <li><%= comment.text %></li>
+                      <% } %>
+                    <% }) %>
+                  </ul></div></div><hr>
+                  <form action="/add-comment/<%= place.id %>" method="post" class="commentForm">
+                    <input type="text" name="text" placeholder="Írj megjegyzést">
+                    <button type="submit">Megjegyzés közzététele</button>
+                  </form>`;
+    if (openInfoWindow) {
+          openInfoWindow.close();
+        }        
+        marker<%= place.id %>.setIcon({
+            url: '/images/blue_marker.png', // Replace with your custom marker icon path
+            scaledSize: new google.maps.Size(32, 32), // Adjust the size if needed
+          });
+
+          document.querySelectorAll('.star').forEach(item => {
+  item.addEventListener('click', event => {
+    const ratingValue = parseInt(item.getAttribute('data-rating'));
+    const placeId = <%= place.id %> /* Your logic to retrieve the place ID */ // Replace this with your logic to retrieve the place ID
+    console.log(ratingValue)
+    console.log(placeId)
+    // Add your logic here to send a POST request with the rating value and place ID
+    fetch('/add-rating/<%= place.id %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ markerId: placeId, rating: ratingValue })
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('POST request successful:', data);
+      // Add any additional handling if needed
+    })
+    .catch(error => {
+      //console.error('Error during POST request:', error);
+      // Handle errors
+    });
+
+    // Visual feedback: update star appearance based on rating
+    document.querySelectorAll('.star').forEach(star => {
+      const starRating = parseInt(star.getAttribute('data-rating'));
+      if (starRating <= ratingValue) {
+        star.classList.add('fa-solid');
+      } else {
+        star.classList.remove('fa-solid');
+      }
+    });
+  });
+});
+
+    infoWindow<%= place.id %>.open(map, marker<%= place.id %>);
+    openInfoWindow = infoWindow<%= place.id %>;
+      });  
+
+      
+      <%}%>
+    <% }); %>
+
+    <% if (selectedMarkerData) { %>
+    // Pre-select the marker based on selectedMarkerData
+   // const selectedMarkerId = <%= selectedMarkerData.id %>;
+
+    const markerToHighlight = markers.find(markerData => markerData.id === selectedMarkerId);
+    if (markerToHighlight) {
+      const marker = markerToHighlight.marker;
+      const infoWindow = new google.maps.InfoWindow({
+        content: `<strong>Hely neve:</strong> <%= selectedMarkerData.placename %><br>
+                  <strong>Leírás:</strong> <%= selectedMarkerData.description %><br>
+                  <strong>Ár:</strong> <%= selectedMarkerData.cost %><br>
+                  <strong>Dátum:</strong> <%= new Date(selectedMarkerData.date).toISOString().split('T')[0].replace(/-/g, '.') %>`,
+      });
+
+      marker.setIcon({
+        url: '/images/blue_marker.png',
+        scaledSize: new google.maps.Size(32, 32),
+      });
+
+      infoWindow.open(map, marker);
+      openInfoWindow = infoWindow; // Ensure to update openInfoWindow
+    }
+  <% } %>
+
+    
+     google.maps.event.addListener(map, 'click', () => {
+        resetMarkers();
+        
+        if (openInfoWindow) {
+          
+          openInfoWindow.close();
+          openInfoWindow = null;
+        }
+
+        const center = map.getCenter();
+  const latitude = center.lat().toFixed(6); // Limit to 6 decimal places
+  const longitude = center.lng().toFixed(6);
+  const zoomAmount = map.getZoom();
+  
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.delete('marker');  // Remove the 'marker' query parameter
+
+  const newUrl = `${window.location.origin}/map?lat=${latitude}&lng=${longitude}&zoom=${zoomAmount}`;
+
+// Update the browser's URL without reloading the page
+history.replaceState(null, '', newUrl);
+
+
+        const selectedPlaceElement = document.querySelector('.selectedPlace');
+        selectedPlaceElement.innerHTML = `<% const uniqueMarkerIds2 = []; %>
+<% ratings.forEach(rating => { %>
+  <% if (!uniqueMarkerIds2.includes(rating.markerId)) { %>
+    <div class="placedetail">
+      <hr class="hrWithoutMargin">
+      <% const place = places.find(place => place.id === rating.markerId); %>
+      <% if (place) { %>
+        <div class="place-info">
+          <span class="place-name"><%= place.placename %></span> <!-- Display placename -->
+          <span class="rating-count">(<%= ratings.filter(r => r.markerId === rating.markerId).length %>)</span> <!-- Display rating count -->
+        </div>
+      <% } %>
+      <% const ratingsForId = ratings.filter(r => r.markerId === rating.markerId); %>
+      <% if (ratingsForId.length > 0) { %>
+        <div class="rating-info2">
+
+            <% const totalRating = ratingsForId.reduce((acc, cur) => acc + cur.rating, 0); %>
+            <% const avgRating = totalRating / ratingsForId.length; %>
+            <% const roundedRating = Math.round(avgRating); %>
+            <div class="avg-rating"><%= avgRating.toFixed(1) %></div>
+              <div class="star-rating">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <i class="far fa-star <%= i <= roundedRating ? 'fa-solid' : '' %>"></i>
+                <% } %>
+              </div>
+        </div>
+      <% } else { %>
+        <div class="no-ratings">No ratings for this marker ID</div>
+      <% } %>
+      
+    </div>
+    <% uniqueMarkerIds2.push(rating.markerId); %>
+  <% } %>
+<% }) %>
+ 
+`; 
+      });
+  }
+
+    </script>
+</body>
+</html>
