@@ -1,0 +1,303 @@
+/* style.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f2f2f2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  footer{
+    margin-top: auto;
+}
+
+  #header {
+    text-align: center;
+    padding: 20px 0;
+    background-color: #333;
+    color: #fff;
+    margin: 0;
+  }
+    
+  #logo-container {
+    background-color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+  }
+
+  #gyros-logo {
+    width: 50px; /* Adjust the width as needed */
+    margin-right: 10px; /* Add margin between the image and text */
+  }
+
+  h1 {
+    text-align: center;
+    padding: 20px 0;
+    color: #fff;
+    margin: 0;
+  }
+  
+  ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px;
+  }
+  
+  li {
+    margin-bottom: 20px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  #map-container {
+      position: relative; /* Ensure the map container is positioned relative */
+    
+    overflow: hidden; /* Clear the float */
+    margin: 10px; 
+  }
+  
+  #map {
+    height: 75vh;
+    width: 75%; /* Adjust the width as needed */
+    float: left;
+  }
+  
+/* style.css */
+#starRatingContainer{
+  height:100px;
+}
+
+.selectedPlace {
+  width: 23%; /* Adjust the width as needed */
+  margin-left: 2%; /* Adjust the margin as needed */
+  float: left;
+  max-height: 75vh;
+  background-color: #fff;
+  overflow:auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.selectedPlace strong {
+  color: #333; /* Set text color */
+}
+
+/* Style the scrollbar for the .selectedPlace container */
+.selectedPlace::-webkit-scrollbar {
+  width: 10px; /* Set the width of the scrollbar */
+  
+}
+
+.selectedPlace::-webkit-scrollbar-horizontal {
+  display: none; /* Set the width of the vertical scrollbar */
+}
+
+.selectedPlace::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Set the background color of the scrollbar track */
+}
+
+.selectedPlace::-webkit-scrollbar-thumb {
+  background: #888; /* Set the color of the scrollbar thumb */
+  border-radius: 5px; /* Set the border radius of the scrollbar thumb */
+}
+
+.selectedPlace::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Set the color of the scrollbar thumb on hover */
+}
+
+
+
+.addPlace {
+  width: 18%; /* Adjust the width as needed */
+  margin-left: 2%; /* Adjust the margin as needed */
+  float: left;
+  height: 85vh; /* Set the height to match the map height */
+  background-color: #fff;
+
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#searchInput {
+  position: absolute;
+  top: 10px; /* Adjust the top position as needed */
+  left: 10px; /* Adjust the left position as needed */
+  z-index: 1000; /* Ensure it's above the map */
+  margin-top: 0; /* Remove any margin */
+  margin-left: 0; /* Remove any margin */
+  padding: 10px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  width: 350px;
+  background-color: #f4f4f4;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease-in-out;
+}
+/* Style for the input field when focused */
+#searchInput:focus {
+  outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+/* Placeholder style */
+::placeholder {
+  color: #999;
+}
+
+/* mainDesign.css */
+
+.placeDetail {
+  background-color: #fff;
+  padding: 5px;
+  margin: 5px;
+}
+
+.hrWithoutMargin{
+  margin-top:0;
+}
+
+.placeDetailsContainer {
+  display: flex;
+}
+
+.leftBlock {
+  flex: 1;
+}
+
+.rightBlock {
+  flex: 1;
+  margin-left: 0px; /* Adjust as needed */
+  border-left: 1px solid #ccc; /* Vertical line */
+  padding-left: 0px; /* Adjust as needed */
+}
+
+.rightBlock::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -10px; /* Adjust as needed */
+  width: 1px;
+  background-color: #000000; /* Adjust color as needed */
+}
+
+.detailLabel {
+  color: #333;
+  font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.detailValue {
+  color: #555;
+  /* Add styling for dynamic values */
+}
+
+/* Add more styles as needed */
+
+
+a[href^="http://maps.google.com/maps"]{display:none !important}
+a[href^="https://maps.google.com/maps"]{display:none !important}
+
+.gmnoprint a, .gmnoprint span, .gm-style-cc {
+    display:none;
+}
+.gmnoprint div {
+    background:none !important;
+}
+.commentForm {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.commentForm input[type="text"] {
+  width: 90%; /* Adjust width based on your design */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.commentForm button[type="submit"] {
+  width: 90%; /* Adjust width based on your design */
+  background-color: #4caf50;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin:4px;
+}
+
+.commentForm button[type="submit"]:hover {
+  background-color: #45a049;
+}
+
+
+/* Add this media query to style the page for phones */
+@media only screen and (max-width: 1024px) {
+  /* ... (existing styles for other elements) */
+
+  #map-container {
+    
+    /* Adjust the map container styles for smaller screens */
+    overflow: hidden;
+    margin: 10px;
+  }
+
+  #map {
+    /* Adjust the map styles for smaller screens */
+    height: 80vh; /* Adjust the height as needed */
+    width: 100%; /* Take up the full width of the container */
+    float: none; /* Reset the float */
+  }
+
+  .marker-rating {
+    margin-bottom: 10px;
+  }
+  
+  .place-info {
+    margin-bottom: 5px;
+  }
+  
+  .rating-details {
+    display: flex;
+    align-items: center;
+  }
+  
+  .stars-and-rating {
+    display: flex;
+  }
+  
+  .stars {
+    margin-right: 5px;
+  }
+  
+  .avg-rating {
+    margin-left: 5px;
+  }
+  
+
+  .selectedPlace {
+    /* Adjust the selectedPlace styles for smaller screens */
+    width: 100%; /* Take up the full width of the container */
+    margin: 20px 0; /* Adjust the margin as needed */
+    float: none; /* Reset the float */
+    height: auto; /* Auto height to accommodate content */
+  }
+
+  #searchInput{
+    width:300px;
+  }
+  /* ... (other styles for smaller screens) */
+}
