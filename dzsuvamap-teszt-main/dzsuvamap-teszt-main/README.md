@@ -15,7 +15,7 @@
 ## Version 2
 - **Routing**: Added routing functionality for better navigation.
 - **Direct URLs**: Supports direct URL access with parameters like Latitude, Longitude, Zoom level, and Marker ID (if selected).
-- - **Comments**: Users can now add comments to markers.
+- **Comments**: Users can now add comments to markers.
 - **Ratings**: Added a rating system for places.
 - **Store Marker,Comments, Ratings Data in cloud**: Saves data information in the cloud (MongoDB).
 - **New Marker Design**: Redesigned marker visuals for improved user experience.
