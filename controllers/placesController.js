@@ -14,7 +14,7 @@ exports.getIndex = async (req, res) => {
 
   // Redirect `/` to `/map` with default coordinates if not provided
   if (!lat || !lng || !zoom) {
-    return res.redirect('/map?lat=47.5&lng=19.1&zoom=11');
+    return res.redirect('/map?lat=47.500000&lng=19.100000&zoom=11');
   }
 
   try {
@@ -24,7 +24,7 @@ exports.getIndex = async (req, res) => {
     const selectedMarker = markerId
     ? allPlaces.find((place) => place.id.toString() === markerId)
     : null;
-
+  
     res.render('index', {
       apiKey: `${process.env.API_KEY}`,
       places: allPlaces,
